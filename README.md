@@ -22,7 +22,7 @@ dc_bias.py             # สมการ DC, unit conversion, validation, region
 templates/index.html   # ฟอร์ม + ตารางผลลัพธ์ (Jinja2)
 static/style.css       # responsive layout
 tests/test_dc_bias.py  # 12 เทสต์ (engineering)
-tests/test_web.py      # 9 เทสต์ (HTTP ด้วย Flask test client)
+tests/test_web.py      # 13 เทสต์ (HTTP ด้วย Flask test client)
 docs/                  # design note, validation record, reflection
 ```
 
@@ -56,7 +56,7 @@ python -m flask --app app run --debug
 python -m unittest discover -s tests -v
 ```
 
-ผลที่คาดหวัง: `Ran 21 tests ... OK`
+ผลที่คาดหวัง: `Ran 25 tests ... OK`
 
 ## ค่าอ้างอิงสำหรับตรวจด้วยมือ
 

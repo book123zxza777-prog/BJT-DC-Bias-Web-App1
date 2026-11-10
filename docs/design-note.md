@@ -14,7 +14,7 @@
 | `templates/index.html` | ฟอร์มรับค่า + ตารางผลลัพธ์ (ไม่มีสมการ ไม่คำนวณ) |
 | `static/style.css` | layout สองคอลัมน์ ยุบเป็นคอลัมน์เดียวที่หน้าจอกว้าง ≤ 700 px |
 | `tests/test_dc_bias.py` | เทสต์สมการและ validation (12 เทสต์) |
-| `tests/test_web.py` | เทสต์ HTTP ด้วย Flask test client (9 เทสต์) |
+| `tests/test_web.py` | เทสต์ HTTP ด้วย Flask test client (13 เทสต์) |
 
 ## เส้นทางการไหลของข้อมูล
 
