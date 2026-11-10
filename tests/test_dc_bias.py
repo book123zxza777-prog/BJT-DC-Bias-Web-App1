@@ -54,5 +54,62 @@ class TestValidation(unittest.TestCase):
             self.assertIn("vcc", ctx.exception.errors)
 
 
+from dc_bias import (  # noqa: E402
+    REGION_ACTIVE, REGION_CUTOFF, REGION_SATURATION, calculate,
+)
+
+
+class TestCalculateActive(unittest.TestCase):
+    def test_reference_operating_point(self):
+        r = calculate(make())
+        self.assertEqual(r.region, REGION_ACTIVE)
+        self.assertEqual(r.warnings, ())
+        self.assertAlmostEqual(r.vth, 2.163934, places=5)
+        self.assertAlmostEqual(r.rth, 18032.7869, places=3)
+        self.assertAlmostEqual(r.ib * 1e6, 12.2986, places=3)   # µA
+        self.assertAlmostEqual(r.ic * 1e3, 1.22986, places=5)   # mA
+        self.assertAlmostEqual(r.ie * 1e3, 1.24216, places=5)   # mA
+        self.assertAlmostEqual(r.ve, 1.24216, places=5)
+        self.assertAlmostEqual(r.vb, 1.94216, places=5)
+        self.assertAlmostEqual(r.vc, 9.29431, places=5)
+        self.assertAlmostEqual(r.vce, 8.052155, places=5)
+
+    def test_active_invariants(self):
+        r = calculate(make())
+        self.assertAlmostEqual(r.ie, (100 + 1) * r.ib, places=12)
+        self.assertAlmostEqual(r.vb, r.ve + 0.7, places=12)
+        self.assertAlmostEqual(r.vce, r.vc - r.ve, places=12)
+
+    def test_low_beta_stays_consistent(self):
+        r = calculate(make(beta=1.0))
+        self.assertEqual(r.region, REGION_ACTIVE)
+        self.assertAlmostEqual(r.ic, r.ib, places=12)
+        self.assertAlmostEqual(r.ie, 2 * r.ib, places=12)
+
+
+class TestCalculateRegions(unittest.TestCase):
+    def test_cutoff(self):
+        r = calculate(make(r1=1e5, r2=1e3))
+        self.assertEqual(r.region, REGION_CUTOFF)
+        self.assertTrue(r.warnings)
+        self.assertEqual((r.ib, r.ic, r.ie), (0.0, 0.0, 0.0))
+        self.assertEqual(r.ve, 0.0)
+        self.assertAlmostEqual(r.vb, 12 * 1e3 / 101e3, places=9)
+        self.assertEqual(r.vc, 12.0)
+        self.assertEqual(r.vce, 12.0)
+
+    def test_saturation(self):
+        r = calculate(make(rc=2e4))
+        self.assertEqual(r.region, REGION_SATURATION)
+        self.assertTrue(r.warnings)
+        self.assertLess(r.vce, 0.3)
+
+
+class TestCalculateGuardrails(unittest.TestCase):
+    def test_overflow_raises_validation_error(self):
+        with self.assertRaises(ValidationError):
+            calculate(make(vcc=1e308, r1=1e308, r2=1e308))
+
+
 if __name__ == "__main__":
     unittest.main()
