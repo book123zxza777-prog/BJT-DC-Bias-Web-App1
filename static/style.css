@@ -104,6 +104,16 @@ button:hover { background: #164f6f; }
 
 .alert ul { margin: 6px 0 0; padding-left: 18px; }
 
+.error-field { font-weight: bold; }
+
+.field-error {
+  margin: 5px 0 0;
+  color: var(--error);
+  font-size: 0.8rem;
+}
+
+.alert-error { border-left-color: var(--error); }
+
 .alert-warning {
   border-left-color: var(--warning);
   background: #fff4e9;

@@ -50,6 +50,21 @@ REGION_LABELS = {
     REGION_SATURATION: "Saturation",
 }
 
+FIELD_LABELS = {
+    "vcc": "VCC",
+    "r1": "R1",
+    "r2": "R2",
+    "rc": "RC",
+    "re": "RE",
+    "beta": "β",
+    "vbe": "VBE",
+    "unit_r1": "หน่วย R1",
+    "unit_r2": "หน่วย R2",
+    "unit_rc": "หน่วย RC",
+    "unit_re": "หน่วย RE",
+    "__all__": "ผลการคำนวณ",
+}
+
 
 def parse_inputs(form: Mapping[str, str]) -> tuple[BiasInputs | None, dict[str, str]]:
     """Parse and convert the submitted form, returning inputs or field errors."""
@@ -127,6 +142,7 @@ def index():
         values=DEFAULT_VALUES,
         units=DEFAULT_UNITS,
         unit_labels=UNIT_LABELS,
+        field_labels=FIELD_LABELS,
         errors={},
         result=None,
     )
@@ -151,6 +167,7 @@ def calculate_route():
                 values=values,
                 units=units,
                 unit_labels=UNIT_LABELS,
+                field_labels=FIELD_LABELS,
                 errors=errors,
                 result=None,
             ),
@@ -162,6 +179,7 @@ def calculate_route():
         values=values,
         units=units,
         unit_labels=UNIT_LABELS,
+        field_labels=FIELD_LABELS,
         errors={},
         result=result,
     )
