@@ -45,6 +45,23 @@ h2 { font-size: 1.1rem; margin: 0 0 14px; color: var(--accent); }
   padding: 20px 22px;
 }
 
+.circuit-wrap {
+  margin: 14px 0 18px;
+  text-align: center;
+}
+
+.circuit-diagram {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}
+
+.circuit-caption {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 .field { margin-bottom: 12px; }
 
 label {

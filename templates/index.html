@@ -16,6 +16,69 @@
     <section class="card form-card">
       <h2>ค่าอุปกรณ์</h2>
 
+      <div class="circuit-wrap">
+        <svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" class="circuit-diagram" role="img" aria-labelledby="circuitTitle">
+          <title id="circuitTitle">BJT Voltage-Divider Bias Circuit</title>
+          <defs>
+            <marker id="emitArrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+            </marker>
+          </defs>
+
+          <!-- Rails -->
+          <line x1="80" y1="60" x2="400" y2="60" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="80" y1="300" x2="400" y2="300" stroke="#2c3e50" stroke-width="2"/>
+
+          <text x="60" y="55" font-family="sans-serif" font-size="15" font-weight="bold" fill="#17344b">VCC</text>
+          <text x="30" y="305" font-family="sans-serif" font-size="15" fill="#17344b">Ground</text>
+
+          <!-- R1: VCC down to Base node -->
+          <line x1="180" y1="60" x2="180" y2="155" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="170,75 180,85 170,95 180,105 170,115 180,125 170,135 180,145" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="180" y1="155" x2="180" y2="180" stroke="#2c3e50" stroke-width="2"/>
+          <text x="155" y="120" font-family="sans-serif" font-size="13" fill="#546d83">R1</text>
+
+          <!-- R2: Base node down to Ground -->
+          <line x1="180" y1="180" x2="180" y2="245" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="170,195 180,205 170,215 180,225 170,235" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="180" y1="245" x2="180" y2="300" stroke="#2c3e50" stroke-width="2"/>
+          <text x="155" y="240" font-family="sans-serif" font-size="13" fill="#546d83">R2</text>
+
+          <!-- Base node dot -->
+          <circle cx="180" cy="180" r="4" fill="#2c3e50"/>
+
+          <!-- Wire Base node to Q1 Base -->
+          <line x1="180" y1="180" x2="260" y2="180" stroke="#2c3e50" stroke-width="2"/>
+
+          <!-- Q1 NPN -->
+          <!-- Collector-Emitter spine -->
+          <line x1="320" y1="120" x2="320" y2="200" stroke="#2c3e50" stroke-width="2"/>
+          <!-- Base into spine -->
+          <line x1="260" y1="180" x2="320" y2="180" stroke="#2c3e50" stroke-width="2"/>
+          <!-- Emitter arrow (NPN: points outward/down) -->
+          <line x1="312" y1="205" x2="328" y2="205" stroke="#2c3e50" stroke-width="2"/>
+          <path d="M 312 205 L 320 215 L 328 205" fill="#2c3e50"/>
+          <line x1="320" y1="215" x2="320" y2="230" stroke="#2c3e50" stroke-width="2"/>
+
+          <text x="335" y="125" font-family="sans-serif" font-size="13" fill="#546d83">C</text>
+          <text x="245" y="165" font-family="sans-serif" font-size="13" fill="#546d83">B</text>
+          <text x="335" y="240" font-family="sans-serif" font-size="13" fill="#546d83">E</text>
+          <text x="305" y="190" font-family="sans-serif" font-size="13" font-weight="bold" fill="#17344b">Q1</text>
+          <text x="305" y="205" font-family="sans-serif" font-size="11" fill="#546d83">NPN</text>
+
+          <!-- RC: VCC rail to Collector -->
+          <line x1="320" y1="60" x2="320" y2="120" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="310,75 320,85 310,95 320,105" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <text x="340" y="100" font-family="sans-serif" font-size="13" fill="#546d83">RC</text>
+
+          <!-- RE: Emitter to Ground rail -->
+          <line x1="320" y1="230" x2="320" y2="300" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="310,245 320,255 310,265 320,275" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <text x="340" y="265" font-family="sans-serif" font-size="13" fill="#546d83">RE</text>
+        </svg>
+        <p class="circuit-caption">วงจร Voltage-Divider Bias (NPN Common-Emitter)</p>
+      </div>
+
       {% if errors %}
       <div class="alert alert-error">
         <strong>ตรวจสอบข้อมูลอีกครั้ง</strong>
