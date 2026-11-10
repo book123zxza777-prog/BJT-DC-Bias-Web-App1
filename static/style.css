@@ -1,0 +1,109 @@
+:root {
+  --ink: #17344b;
+  --muted: #546d83;
+  --line: #d3e0ec;
+  --paper: #f5f8fc;
+  --accent: #1d638b;
+  --error: #b3261e;
+  --warning: #b85c2c;
+  --ok: #178875;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.6 Tahoma, "Noto Sans Thai", "Leelawadee UI", Arial, sans-serif;
+}
+
+.page-header {
+  padding: 28px 20px 10px;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+h1 { font-size: 1.55rem; margin: 0 0 4px; }
+h2 { font-size: 1.1rem; margin: 0 0 14px; color: var(--accent); }
+.subtitle { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+.layout {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 12px 20px 48px;
+  display: grid;
+  grid-template-columns: minmax(300px, 420px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 20px 22px;
+}
+
+.field { margin-bottom: 12px; }
+
+label {
+  display: block;
+  font-size: 0.86rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.hint {
+  font-weight: normal;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+input, select, button {
+  font: inherit;
+  color: inherit;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.field-inline {
+  display: grid;
+  grid-template-columns: 1fr 92px;
+  gap: 8px;
+}
+
+button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover { background: #164f6f; }
+
+.alert {
+  border-left: 4px solid var(--error);
+  background: #fdecea;
+  padding: 10px 14px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 14px;
+  font-size: 0.9rem;
+}
+
+.alert ul { margin: 6px 0 0; padding-left: 18px; }
+
+@media (max-width: 700px) {
+  .layout { grid-template-columns: 1fr; }
+}

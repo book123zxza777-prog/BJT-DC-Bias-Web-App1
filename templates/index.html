@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BJT DC Bias — Voltage Divider</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="page-header">
+    <h1>BJT DC Bias Calculator</h1>
+    <p class="subtitle">NPN Common-Emitter · Voltage-Divider Bias · Forward-Active Approximation</p>
+  </header>
+
+  <main class="layout">
+    <section class="card form-card">
+      <h2>ค่าอุปกรณ์</h2>
+
+      {% if errors %}
+      <div class="alert alert-error">
+        <strong>ตรวจสอบข้อมูลอีกครั้ง</strong>
+        <ul>
+          {% for key, message in errors.items() %}
+          <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form method="post" action="/calculate">
+        <div class="field">
+          <label for="vcc">VCC (V)</label>
+          <input id="vcc" name="vcc" type="text" inputmode="decimal" value="{{ values['vcc'] }}">
+        </div>
+
+        {% for item in [
+          ('r1', 'R1', 'VCC → Base'),
+          ('r2', 'R2', 'Base → Ground'),
+          ('rc', 'RC', 'VCC → Collector'),
+          ('re', 'RE', 'Emitter → Ground')
+        ] %}
+        <div class="field">
+          <label for="{{ item[0] }}">{{ item[1] }} <span class="hint">{{ item[2] }}</span></label>
+          <div class="field-inline">
+            <input id="{{ item[0] }}" name="{{ item[0] }}" type="text" inputmode="decimal"
+                   value="{{ values[item[0]] }}">
+            <select name="unit_{{ item[0] }}" aria-label="หน่วยของ {{ item[1] }}">
+              {% for unit_value, unit_label in unit_labels.items() %}
+              <option value="{{ unit_value }}"{% if units[item[0]] == unit_value %} selected{% endif %}>{{ unit_label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        {% endfor %}
+
+        <div class="field">
+          <label for="beta">β (hFE)</label>
+          <input id="beta" name="beta" type="text" inputmode="decimal" value="{{ values['beta'] }}">
+        </div>
+
+        <div class="field">
+          <label for="vbe">VBE (V)</label>
+          <input id="vbe" name="vbe" type="text" inputmode="decimal" value="{{ values['vbe'] }}">
+        </div>
+
+        <button type="submit">คำนวณ DC Bias</button>
+      </form>
+    </section>
+
+    {% if result %}
+    <section class="card result-card">
+      <h2>ผลการคำนวณ</h2>
+    </section>
+    {% endif %}
+  </main>
+</body>
+</html>
