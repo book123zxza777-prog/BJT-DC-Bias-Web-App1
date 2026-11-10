@@ -19,5 +19,65 @@ class TestIndexPage(unittest.TestCase):
         self.assertNotIn("ผลการคำนวณ", html)   # ยังไม่แสดงผลลัพธ์
 
 
+VALID = {
+    "vcc": "12", "r1": "100", "r2": "22", "rc": "2.2", "re": "1",
+    "beta": "100", "vbe": "0.70",
+    "unit_r1": "kohm", "unit_r2": "kohm", "unit_rc": "kohm", "unit_re": "kohm",
+}
+
+
+class TestCalculateRoute(unittest.TestCase):
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_valid_post_shows_computed_results(self):
+        res = self.client.post("/calculate", data=VALID)
+        self.assertEqual(res.status_code, 200)
+        html = res.get_data(as_text=True)
+        for expected in ("1.942", "1.242", "9.294", "8.052", "1.230", "18.03"):
+            self.assertIn(expected, html)
+        self.assertIn("Active", html)
+
+    def test_form_echoes_submitted_values(self):
+        data = dict(VALID, r1="99", unit_r1="ohm")
+        html = self.client.post("/calculate", data=data).get_data(as_text=True)
+        self.assertIn('value="99"', html)
+        self.assertIn('value="ohm" selected', html)
+
+    def test_invalid_resistor_returns_400(self):
+        res = self.client.post("/calculate", data=dict(VALID, r1="0"))
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("มากกว่า 0", res.get_data(as_text=True))
+
+    def test_non_numeric_returns_400(self):
+        res = self.client.post("/calculate", data=dict(VALID, vcc="abc"))
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("ตัวเลข", res.get_data(as_text=True))
+
+    def test_empty_form_returns_400_with_errors(self):
+        res = self.client.post("/calculate", data={})
+        self.assertEqual(res.status_code, 400)
+        html = res.get_data(as_text=True)
+        self.assertIn("ตัวเลข", html)
+
+    def test_invalid_unit_returns_400(self):
+        data = dict(VALID, unit_r1="megohm")
+        res = self.client.post("/calculate", data=data)
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("หน่วย", res.get_data(as_text=True))
+
+    def test_cutoff_shows_warning(self):
+        data = dict(VALID, r2="1")
+        res = self.client.post("/calculate", data=data)
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("Cutoff", res.get_data(as_text=True))
+
+    def test_saturation_shows_warning(self):
+        data = dict(VALID, rc="20")
+        res = self.client.post("/calculate", data=data)
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("Saturation", res.get_data(as_text=True))
+
+
 if __name__ == "__main__":
     unittest.main()

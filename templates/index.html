@@ -70,6 +70,37 @@
     {% if result %}
     <section class="card result-card">
       <h2>ผลการคำนวณ</h2>
+
+      <p class="region region-{{ result['region'] }}">
+        Operating Region: <strong>{{ result['region_label'] }}</strong>
+      </p>
+
+      {% if result['warnings'] %}
+      <div class="alert alert-warning">
+        {% for message in result['warnings'] %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <table class="results">
+        <tbody>
+          <tr><th scope="row">VB</th><td>{{ result['vb'] }} V</td></tr>
+          <tr><th scope="row">VE</th><td>{{ result['ve'] }} V</td></tr>
+          <tr><th scope="row">VC</th><td>{{ result['vc'] }} V</td></tr>
+          <tr class="highlight"><th scope="row">VCE</th><td>{{ result['vce'] }} V</td></tr>
+          <tr><th scope="row">IC</th><td>{{ result['ic_ma'] }} mA</td></tr>
+          <tr><th scope="row">IB</th><td>{{ result['ib_ua'] }} µA</td></tr>
+          <tr><th scope="row">IE</th><td>{{ result['ie_ma'] }} mA</td></tr>
+          <tr class="derived"><th scope="row">VTH</th><td>{{ result['vth'] }} V</td></tr>
+          <tr class="derived"><th scope="row">RTH</th><td>{{ result['rth_kohm'] }} kΩ</td></tr>
+        </tbody>
+      </table>
+
+      <p class="note">
+        แบบจำลอง Forward-Active: β คงที่, VBE คงที่ และ VCE,sat = 0.3 V
+        ค่าที่อยู่นอกย่านนี้เป็นเพียงการประมาณและไม่ควรใช้โดยไม่มีคำเตือน
+      </p>
     </section>
     {% endif %}
   </main>
