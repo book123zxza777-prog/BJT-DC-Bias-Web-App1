@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>โหมดไม่ถูกต้อง — BJT DC Bias</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="page-header">
+    <h1>BJT DC Bias Calculator</h1>
+    <p class="subtitle">โหมดการไบอัสไม่ถูกต้อง</p>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>โหมดไม่ถูกต้อง</h2>
+      <div class="alert alert-error">
+        <p>{{ message }}</p>
+        {% if submitted_mode %}
+        <p>ค่าที่ส่งมา: <code>{{ submitted_mode }}</code></p>
+        {% endif %}
+      </div>
+      <p><a class="back-link" href="{{ url_for('index') }}">กลับไปเลือกโหมด</a></p>
+    </section>
+  </main>
+</body>
+</html>
