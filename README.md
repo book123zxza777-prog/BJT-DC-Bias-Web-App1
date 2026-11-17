@@ -78,7 +78,7 @@ python -m flask --app app run --debug
 ## GitHub / Commit ส่งงาน
 
 - Repository: <https://github.com/book123zxza777-prog/BJT-DC-Bias-Web-App1>
-- CommitSHA ของงาน Lab 03 (ก่อน commit เอกสารรอบสุดท้าย): `8388b8a`
+- CommitSHA ของงาน Lab 03 (commit ที่ tree สะอาด ไม่มี log ถูก track): `4e4b285`
 - Branch: `main`
 
 ## การตรวจผ่าน Browser (A1–A5)
