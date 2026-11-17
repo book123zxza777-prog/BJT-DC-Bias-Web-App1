@@ -3,24 +3,42 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BJT DC Bias — Voltage Divider</title>
+  <title>BJT DC Bias — {{ mode_label }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header class="page-header">
     <h1>BJT DC Bias Calculator</h1>
-    <p class="subtitle">NPN Common-Emitter · Voltage-Divider Bias · Forward-Active Approximation</p>
+    <p class="subtitle">NPN Common-Emitter · Voltage Divider / Fixed / Emitter Bias · Forward-Active Approximation</p>
   </header>
 
   <main class="layout">
     <section class="card form-card">
-      <h2>ค่าอุปกรณ์</h2>
+      <h2>ค่าอุปกรณ์ — {{ mode_label }}</h2>
 
+      <form method="get" action="/" class="mode-bar">
+        <label for="mode">โหมดการไบอัส</label>
+        <div class="mode-inline">
+          <select id="mode" name="mode">
+            {% for mode_value, mode_text in mode_options %}
+            <option value="{{ mode_value }}"{% if mode_value == mode %} selected{% endif %}>{{ mode_text }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="mode-button">เปลี่ยนโหมด</button>
+        </div>
+        <input type="hidden" name="vcc" value="{{ values['vcc'] }}">
+        <input type="hidden" name="rc" value="{{ values['rc'] }}">
+        <input type="hidden" name="unit_rc" value="{{ units['rc'] }}">
+        <input type="hidden" name="beta" value="{{ values['beta'] }}">
+        <input type="hidden" name="vbe" value="{{ values['vbe'] }}">
+      </form>
+
+      {% if mode == 'divider' %}
       <div class="circuit-wrap">
-        <svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" class="circuit-diagram" role="img" aria-labelledby="circuitTitle">
-          <title id="circuitTitle">BJT Voltage-Divider Bias Circuit</title>
+        <svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" class="circuit-diagram" role="img" aria-labelledby="circuitTitleDivider">
+          <title id="circuitTitleDivider">BJT Voltage-Divider Bias Circuit</title>
           <defs>
-            <marker id="emitArrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+            <marker id="emitArrowDivider" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
               <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
             </marker>
           </defs>
@@ -51,11 +69,8 @@
           <line x1="180" y1="180" x2="260" y2="180" stroke="#2c3e50" stroke-width="2"/>
 
           <!-- Q1 NPN -->
-          <!-- Collector-Emitter spine -->
           <line x1="320" y1="120" x2="320" y2="200" stroke="#2c3e50" stroke-width="2"/>
-          <!-- Base into spine -->
           <line x1="260" y1="180" x2="320" y2="180" stroke="#2c3e50" stroke-width="2"/>
-          <!-- Emitter arrow (NPN: points outward/down) -->
           <line x1="312" y1="205" x2="328" y2="205" stroke="#2c3e50" stroke-width="2"/>
           <path d="M 312 205 L 320 215 L 328 205" fill="#2c3e50"/>
           <line x1="320" y1="215" x2="320" y2="230" stroke="#2c3e50" stroke-width="2"/>
@@ -78,10 +93,105 @@
         </svg>
         <p class="circuit-caption">วงจร Voltage-Divider Bias (NPN Common-Emitter)</p>
       </div>
+      {% elif mode == 'fixed' %}
+      <div class="circuit-wrap">
+        <svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" class="circuit-diagram" role="img" aria-labelledby="circuitTitleFixed">
+          <title id="circuitTitleFixed">BJT Fixed Bias Circuit</title>
+
+          <!-- Rails -->
+          <line x1="80" y1="60" x2="400" y2="60" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="80" y1="300" x2="400" y2="300" stroke="#2c3e50" stroke-width="2"/>
+
+          <text x="60" y="55" font-family="sans-serif" font-size="15" font-weight="bold" fill="#17344b">VCC</text>
+          <text x="30" y="305" font-family="sans-serif" font-size="15" fill="#17344b">Ground</text>
+
+          <!-- RB: VCC down to Base node -->
+          <line x1="180" y1="60" x2="180" y2="155" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="170,75 180,85 170,95 180,105 170,115 180,125 170,135 180,145" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="180" y1="155" x2="180" y2="180" stroke="#2c3e50" stroke-width="2"/>
+          <text x="155" y="120" font-family="sans-serif" font-size="13" fill="#546d83">RB</text>
+
+          <!-- Base node dot -->
+          <circle cx="180" cy="180" r="4" fill="#2c3e50"/>
+
+          <!-- Wire Base node to Q1 Base -->
+          <line x1="180" y1="180" x2="260" y2="180" stroke="#2c3e50" stroke-width="2"/>
+
+          <!-- Q1 NPN -->
+          <line x1="320" y1="120" x2="320" y2="200" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="260" y1="180" x2="320" y2="180" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="312" y1="205" x2="328" y2="205" stroke="#2c3e50" stroke-width="2"/>
+          <path d="M 312 205 L 320 215 L 328 205" fill="#2c3e50"/>
+          <line x1="320" y1="215" x2="320" y2="300" stroke="#2c3e50" stroke-width="2"/>
+
+          <text x="335" y="125" font-family="sans-serif" font-size="13" fill="#546d83">C</text>
+          <text x="245" y="165" font-family="sans-serif" font-size="13" fill="#546d83">B</text>
+          <text x="335" y="240" font-family="sans-serif" font-size="13" fill="#546d83">E</text>
+          <text x="305" y="190" font-family="sans-serif" font-size="13" font-weight="bold" fill="#17344b">Q1</text>
+          <text x="305" y="205" font-family="sans-serif" font-size="11" fill="#546d83">NPN</text>
+
+          <!-- RC: VCC rail to Collector -->
+          <line x1="320" y1="60" x2="320" y2="120" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="310,75 320,85 310,95 320,105" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <text x="340" y="100" font-family="sans-serif" font-size="13" fill="#546d83">RC</text>
+        </svg>
+        <p class="circuit-caption">วงจร Fixed Bias (RB จาก VCC ไป Base, ไม่มี RE)</p>
+      </div>
+      {% else %}
+      <div class="circuit-wrap">
+        <svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" class="circuit-diagram" role="img" aria-labelledby="circuitTitleEmitter">
+          <title id="circuitTitleEmitter">BJT Emitter Bias Circuit</title>
+
+          <!-- Rails -->
+          <line x1="80" y1="60" x2="400" y2="60" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="80" y1="300" x2="400" y2="300" stroke="#2c3e50" stroke-width="2"/>
+
+          <text x="60" y="55" font-family="sans-serif" font-size="15" font-weight="bold" fill="#17344b">VCC</text>
+          <text x="30" y="305" font-family="sans-serif" font-size="15" fill="#17344b">Ground</text>
+
+          <!-- RB: VCC down to Base node -->
+          <line x1="180" y1="60" x2="180" y2="155" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="170,75 180,85 170,95 180,105 170,115 180,125 170,135 180,145" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="180" y1="155" x2="180" y2="180" stroke="#2c3e50" stroke-width="2"/>
+          <text x="155" y="120" font-family="sans-serif" font-size="13" fill="#546d83">RB</text>
+
+          <!-- Base node dot -->
+          <circle cx="180" cy="180" r="4" fill="#2c3e50"/>
+
+          <!-- Wire Base node to Q1 Base -->
+          <line x1="180" y1="180" x2="260" y2="180" stroke="#2c3e50" stroke-width="2"/>
+
+          <!-- Q1 NPN -->
+          <line x1="320" y1="120" x2="320" y2="200" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="260" y1="180" x2="320" y2="180" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="312" y1="205" x2="328" y2="205" stroke="#2c3e50" stroke-width="2"/>
+          <path d="M 312 205 L 320 215 L 328 205" fill="#2c3e50"/>
+          <line x1="320" y1="215" x2="320" y2="230" stroke="#2c3e50" stroke-width="2"/>
+
+          <text x="335" y="125" font-family="sans-serif" font-size="13" fill="#546d83">C</text>
+          <text x="245" y="165" font-family="sans-serif" font-size="13" fill="#546d83">B</text>
+          <text x="335" y="240" font-family="sans-serif" font-size="13" fill="#546d83">E</text>
+          <text x="305" y="190" font-family="sans-serif" font-size="13" font-weight="bold" fill="#17344b">Q1</text>
+          <text x="305" y="205" font-family="sans-serif" font-size="11" fill="#546d83">NPN</text>
+
+          <!-- RC: VCC rail to Collector -->
+          <line x1="320" y1="60" x2="320" y2="120" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="310,75 320,85 310,95 320,105" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <text x="340" y="100" font-family="sans-serif" font-size="13" fill="#546d83">RC</text>
+
+          <!-- RE: Emitter to Ground rail -->
+          <line x1="320" y1="230" x2="320" y2="300" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="310,245 320,255 310,265 320,275" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <text x="340" y="265" font-family="sans-serif" font-size="13" fill="#546d83">RE</text>
+        </svg>
+        <p class="circuit-caption">วงจร Emitter Bias (แหล่งจ่ายเดียว: RB, RC และ RE)</p>
+      </div>
+      {% endif %}
 
       {% if errors %}
       <div class="alert alert-error">
         <strong>ตรวจสอบข้อมูลอีกครั้ง</strong>
+        <p class="mode-line">โหมด: <strong>{{ mode_label }}</strong></p>
         <ul>
           {% for key, message in errors.items() %}
           <li><span class="error-field">{{ field_labels.get(key, key) }}</span>: {{ message }}</li>
@@ -90,32 +200,36 @@
       </div>
       {% endif %}
 
+      {% set resistor_meta = {
+        'r1': ('R1', 'VCC → Base'),
+        'r2': ('R2', 'Base → Ground'),
+        'rc': ('RC', 'VCC → Collector'),
+        're': ('RE', 'Emitter → Ground'),
+        'rb': ('RB', 'VCC → Base')
+      } %}
       <form method="post" action="/calculate">
+        <input type="hidden" name="mode" value="{{ mode }}">
+
         <div class="field">
           <label for="vcc">VCC (V)</label>
           <input id="vcc" name="vcc" type="text" inputmode="decimal" value="{{ values['vcc'] }}">
           {% if errors.get('vcc') %}<p class="field-error">{{ errors['vcc'] }}</p>{% endif %}
         </div>
 
-        {% for item in [
-          ('r1', 'R1', 'VCC → Base'),
-          ('r2', 'R2', 'Base → Ground'),
-          ('rc', 'RC', 'VCC → Collector'),
-          ('re', 'RE', 'Emitter → Ground')
-        ] %}
+        {% for name in resistors %}
         <div class="field">
-          <label for="{{ item[0] }}">{{ item[1] }} <span class="hint">{{ item[2] }}</span></label>
+          <label for="{{ name }}">{{ resistor_meta[name][0] }} <span class="hint">{{ resistor_meta[name][1] }}</span></label>
           <div class="field-inline">
-            <input id="{{ item[0] }}" name="{{ item[0] }}" type="text" inputmode="decimal"
-                   value="{{ values[item[0]] }}">
-            <select name="unit_{{ item[0] }}" aria-label="หน่วยของ {{ item[1] }}">
+            <input id="{{ name }}" name="{{ name }}" type="text" inputmode="decimal"
+                   value="{{ values[name] }}">
+            <select name="unit_{{ name }}" aria-label="หน่วยของ {{ resistor_meta[name][0] }}">
               {% for unit_value, unit_label in unit_labels.items() %}
-              <option value="{{ unit_value }}"{% if units[item[0]] == unit_value %} selected{% endif %}>{{ unit_label }}</option>
+              <option value="{{ unit_value }}"{% if units[name] == unit_value %} selected{% endif %}>{{ unit_label }}</option>
               {% endfor %}
             </select>
           </div>
-          {% if errors.get(item[0]) %}<p class="field-error">{{ errors[item[0]] }}</p>{% endif %}
-          {% if errors.get('unit_' ~ item[0]) %}<p class="field-error">{{ errors['unit_' ~ item[0]] }}</p>{% endif %}
+          {% if errors.get(name) %}<p class="field-error">{{ errors[name] }}</p>{% endif %}
+          {% if errors.get('unit_' ~ name) %}<p class="field-error">{{ errors['unit_' ~ name] }}</p>{% endif %}
         </div>
         {% endfor %}
 
@@ -137,7 +251,9 @@
 
     {% if result %}
     <section class="card result-card">
-      <h2>ผลการคำนวณ</h2>
+      <h2>ผลการคำนวณ — {{ result['mode_label'] }}</h2>
+
+      <p class="mode-badge">{{ result['mode_label'] }}</p>
 
       <p class="region region-{{ result['region'] }}">
         Operating Region: <strong>{{ result['region_label'] }}</strong>
@@ -160,13 +276,17 @@
           <tr><th scope="row">IC</th><td>{{ result['ic_ma'] }} mA</td></tr>
           <tr><th scope="row">IB</th><td>{{ result['ib_ua'] }} µA</td></tr>
           <tr><th scope="row">IE</th><td>{{ result['ie_ma'] }} mA</td></tr>
+          {% if result['vth'] is not none %}
           <tr class="derived"><th scope="row">VTH</th><td>{{ result['vth'] }} V</td></tr>
+          {% endif %}
+          {% if result['rth_kohm'] is not none %}
           <tr class="derived"><th scope="row">RTH</th><td>{{ result['rth_kohm'] }} kΩ</td></tr>
+          {% endif %}
         </tbody>
       </table>
 
       <p class="note">
-        แบบจำลอง Forward-Active: β คงที่, VBE คงที่ และ VCE,sat = 0.3 V
+        แบบจำลอง Forward-Active: β คงที่, VBE คงที่ และ VCE,sat = 0.2 V
         ค่าที่อยู่นอกย่านนี้เป็นเพียงการประมาณและไม่ควรใช้โดยไม่มีคำเตือน
       </p>
     </section>
