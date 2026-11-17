@@ -11,6 +11,7 @@ ENV/
 instance/
 .flaskenv
 *.sqlite3
+flask*.log
 
 # Testing
 .pytest_cache/
