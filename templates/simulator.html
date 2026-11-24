@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BJT CE Amplifier Simulator — Lab 04</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='simulator.js') }}" defer></script>
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-row">
+      <div>
+        <h1>BJT CE Amplifier Simulator</h1>
+        <p class="subtitle">Lab 04 · Voltage Divider Reference · ngspice .op / .ac / .tran</p>
+      </div>
+      <nav class="app-nav" aria-label="เมนูหลัก">
+        <a href="{{ url_for('index') }}">← DC Bias Calculator (Lab 03)</a>
+        <span class="nav-current">CE SPICE Simulator</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="sim-layout">
+    <section class="card sim-form-card">
+      <div class="card-heading">
+        <h2>วงจรและพารามิเตอร์</h2>
+        <span class="engine-badge {{ 'engine-ok' if engine_available else 'engine-bad' }}">
+          {% if engine_available %}
+          ngspice พร้อมใช้งาน · {{ engine_name }}
+          {% else %}
+          ไม่พบ ngspice
+          {% endif %}
+        </span>
+      </div>
+
+      {% if not engine_available %}
+      <div class="alert alert-warning">
+        <strong>ยังเรียก ngspice ไม่ได้</strong>
+        <p>ติดตั้ง ngspice แล้วเพิ่มโฟลเดอร์ <code>bin</code> ใน PATH หรือกำหนด environment variable
+          <code>NGSPICE_BIN</code> ก่อนกด Run ผลจำลองจะไม่ถูกสร้างขึ้นแทน</p>
+      </div>
+      {% endif %}
+
+      <div class="circuit-wrap">
+        <svg viewBox="0 0 560 380" xmlns="http://www.w3.org/2000/svg"
+             class="circuit-diagram sim-circuit" role="img"
+             aria-labelledby="ceCircuitTitle ceCircuitDesc">
+          <title id="ceCircuitTitle">CE Voltage Divider Amplifier Circuit</title>
+          <desc id="ceCircuitDesc">NPN common-emitter amplifier with voltage-divider bias: VCC feeds R1 and RC; R1 and R2 share the base node; RC feeds the collector; RE connects the emitter to ground; Cin couples the sine source to the base; Cout couples the collector to VOUT and load RL.</desc>
+          <defs>
+            <marker id="simArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+            </marker>
+          </defs>
+
+          <!-- Power and ground rails -->
+          <line x1="50" y1="50" x2="470" y2="50" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="50" y1="330" x2="470" y2="330" stroke="#2c3e50" stroke-width="2"/>
+          <text x="24" y="45" font-family="sans-serif" font-size="15" font-weight="bold" fill="#17344b">VCC</text>
+          <text x="24" y="350" font-family="sans-serif" font-size="15" fill="#17344b">GND</text>
+
+          <!-- R1 -->
+          <line x1="180" y1="50" x2="180" y2="75" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="170,75 180,85 170,95 180,105 170,115 180,125 170,135 180,145" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="180" y1="145" x2="180" y2="175" stroke="#2c3e50" stroke-width="2"/>
+          <text x="155" y="115" font-family="sans-serif" font-size="13" fill="#546d83">R1</text>
+
+          <!-- R2 -->
+          <line x1="180" y1="175" x2="180" y2="200" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="170,200 180,210 170,220 180,230 170,240 180,250 170,260 180,270" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="180" y1="270" x2="180" y2="330" stroke="#2c3e50" stroke-width="2"/>
+          <text x="155" y="240" font-family="sans-serif" font-size="13" fill="#546d83">R2</text>
+          <circle cx="180" cy="175" r="4" fill="#2c3e50"/>
+
+          <!-- Base wire -->
+          <line x1="180" y1="175" x2="300" y2="175" stroke="#2c3e50" stroke-width="2"/>
+
+          <!-- Q1 NPN -->
+          <circle cx="330" cy="180" r="42" fill="#fff" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="300" y1="175" x2="315" y2="175" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="315" y1="155" x2="315" y2="205" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="315" y1="165" x2="330" y2="145" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="330" y1="145" x2="330" y2="120" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="315" y1="195" x2="330" y2="215" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="330" y1="215" x2="330" y2="230" stroke="#2c3e50" stroke-width="2"/>
+          <polygon points="322,205 334,217 327,220" fill="#2c3e50"/>
+          <text x="345" y="132" font-family="sans-serif" font-size="13" fill="#546d83">C</text>
+          <text x="288" y="165" font-family="sans-serif" font-size="13" fill="#546d83">B</text>
+          <text x="345" y="242" font-family="sans-serif" font-size="13" fill="#546d83">E</text>
+          <text x="345" y="186" font-family="sans-serif" font-size="13" font-weight="bold" fill="#17344b">Q1</text>
+          <text x="345" y="201" font-family="sans-serif" font-size="11" fill="#546d83">2N3904</text>
+
+          <!-- RC -->
+          <line x1="330" y1="50" x2="330" y2="70" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="320,70 330,80 320,90 330,100 320,110" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="330" y1="110" x2="330" y2="120" stroke="#2c3e50" stroke-width="2"/>
+          <text x="345" y="96" font-family="sans-serif" font-size="13" fill="#546d83">RC</text>
+
+          <!-- RE -->
+          <line x1="330" y1="230" x2="330" y2="250" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="320,250 330,260 320,270 330,280 320,290 330,300" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="330" y1="300" x2="330" y2="330" stroke="#2c3e50" stroke-width="2"/>
+          <text x="345" y="278" font-family="sans-serif" font-size="13" fill="#546d83">RE</text>
+
+          <!-- Input source and CIN -->
+          <line x1="50" y1="175" x2="50" y2="230" stroke="#2c3e50" stroke-width="2"/>
+          <circle cx="50" cy="255" r="25" fill="#fff" stroke="#2c3e50" stroke-width="2"/>
+          <path d="M 38 255 Q 44 245 50 255 T 62 255" fill="none" stroke="#2c3e50" stroke-width="1.8"/>
+          <line x1="50" y1="280" x2="50" y2="330" stroke="#2c3e50" stroke-width="2"/>
+          <text x="16" y="166" font-family="sans-serif" font-size="13" fill="#17344b">VIN</text>
+          <text x="18" y="305" font-family="sans-serif" font-size="12" fill="#546d83">SIN</text>
+          <line x1="50" y1="175" x2="105" y2="175" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="105" y1="160" x2="105" y2="190" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="115" y1="160" x2="115" y2="190" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="115" y1="175" x2="180" y2="175" stroke="#2c3e50" stroke-width="2"/>
+          <text x="95" y="150" font-family="sans-serif" font-size="13" fill="#546d83">CIN</text>
+
+          <!-- COUT and output load -->
+          <line x1="330" y1="120" x2="385" y2="120" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="385" y1="105" x2="385" y2="135" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="395" y1="105" x2="395" y2="135" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="395" y1="120" x2="430" y2="120" stroke="#2c3e50" stroke-width="2"/>
+          <text x="375" y="95" font-family="sans-serif" font-size="13" fill="#546d83">COUT</text>
+          <circle cx="430" cy="120" r="4" fill="#2c3e50"/>
+          <text x="442" y="110" font-family="sans-serif" font-size="13" font-weight="bold" fill="#17344b">VOUT</text>
+          <line x1="430" y1="120" x2="430" y2="150" stroke="#2c3e50" stroke-width="2"/>
+          <polyline points="420,150 430,160 420,170 430,180 420,190 430,200 420,210 430,220 420,230 430,240 420,250 430,260 420,270 430,280" fill="none" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="430" y1="280" x2="430" y2="330" stroke="#2c3e50" stroke-width="2"/>
+          <text x="445" y="218" font-family="sans-serif" font-size="13" fill="#546d83">RL</text>
+
+          <!-- Shared ground -->
+          <line x1="300" y1="330" x2="300" y2="340" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="285" y1="340" x2="315" y2="340" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="292" y1="347" x2="308" y2="347" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="298" y1="354" x2="302" y2="354" stroke="#2c3e50" stroke-width="2"/>
+        </svg>
+        <p class="circuit-caption">CE Voltage Divider Reference · NPN Q1 (2N3904) · RE ไม่มี bypass capacitor · RL 10 kΩ</p>
+      </div>
+
+      <form method="post" action="{{ url_for('simulate_route') }}" class="sim-form" data-sim-form>
+        <fieldset class="analysis-fieldset">
+          <legend>โหมดวิเคราะห์</legend>
+          <div class="analysis-tabs">
+            {% for value, label, short in analysis_options %}
+            <label class="analysis-tab">
+              <input type="radio" name="analysis" value="{{ value }}"
+                     {% if analysis == value %}checked{% endif %} data-analysis-radio>
+              <span><strong>{{ short }}</strong><small>{{ label }}</small></span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        {% if errors %}
+        <div class="alert alert-error" role="alert">
+          <strong>ตรวจสอบข้อมูลอีกครั้ง</strong>
+          <ul>
+            {% for key, message in errors.items() %}
+            <li><span class="error-field">{{ field_labels.get(key, key) }}</span>: {{ message }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {% for group_id, group_title, group_note, fields in field_groups %}
+        <fieldset class="param-group" data-analysis-group="{{ group_id }}"
+          {% if group_id == 'load' and analysis == 'dc' %}hidden{% endif %}
+          {% if group_id == 'source' and analysis != 'tran' %}hidden{% endif %}>
+          <legend>{{ group_title }} <span class="hint">{{ group_note }}</span></legend>
+          <div class="param-grid">
+            {% for name, label, unit, hint in fields %}
+            <div class="field">
+              <label for="sim-{{ name }}">{{ label }} <span class="unit">({{ unit }})</span>
+                <span class="hint">{{ hint }}</span></label>
+              <input id="sim-{{ name }}" name="{{ name }}" type="text" inputmode="decimal"
+                     value="{{ values[name] }}" autocomplete="off">
+              {% if errors.get(name) %}<p class="field-error">{{ errors[name] }}</p>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </fieldset>
+        {% endfor %}
+
+        <p class="note">
+          โหมด DC ไม่ใช้ RL/CIN/COUT · โหมด AC ใช้แหล่ง AC 1 V ภายในเพื่อวัด Gain ·
+          Amplitude/Frequency มีผลกับ Transient
+        </p>
+        <button type="submit" class="run-button" data-run-button>
+          Run ngspice — {{ analysis_short }}
+        </button>
+        <p class="run-status" data-run-status role="status" aria-live="polite">
+          {% if result %}สถานะ: สำเร็จ — ผลจาก ngspice
+          {% elif error_message %}สถานะ: ผิดพลาด — ดูรายละเอียดด้านขวา
+          {% elif errors %}สถานะ: ข้อมูลไม่ถูกต้อง
+          {% else %}พร้อมรัน — ผลจะมาจาก ngspice จริง{% endif %}
+        </p>
+      </form>
+    </section>
+
+    <section class="card sim-result-card">
+      {% if error_message %}
+      <div class="status-banner status-error">
+        <span class="status-dot"></span>
+        <strong>Simulation failed</strong>
+        <span>ไม่มีผลหรือกราฟเก่าค้างอยู่ในหน้านี้</span>
+      </div>
+      <div class="alert alert-error" role="alert">
+        <strong>
+          {% if error_kind == 'engine' %}ngspice ไม่พร้อมใช้งาน
+          {% elif error_kind == 'simulation' %}ngspice รายงานข้อผิดพลาด
+          {% else %}เกิดข้อผิดพลาด{% endif %}
+        </strong>
+        <p>{{ error_message }}</p>
+      </div>
+      {% if error_kind == 'engine' %}
+      <div class="empty-state">
+        <h2>วิธีแก้</h2>
+        <ol>
+          <li>ติดตั้ง ngspice (Windows ใช้ไฟล์ <code>ngspice-47_64.7z</code> จาก ngspice.sourceforge.io)</li>
+          <li>เพิ่มโฟลเดอร์ <code>Spice64\bin</code> ใน PATH หรือกำหนด <code>NGSPICE_BIN</code></li>
+          <li>รีสตาร์ต Flask แล้วตรวจป้าย “ngspice พร้อมใช้งาน” อีกครั้ง</li>
+        </ol>
+      </div>
+      {% elif error_kind == 'simulation' %}
+      <div class="empty-state">
+        <h2>ตรวจอะไรต่อ</h2>
+        <ul>
+          <li>ค่าอุปกรณ์ต้องมากกว่า 0 และอยู่ในช่วงที่กำหนด</li>
+          <li>ตรวจ netlist/ข้อความจาก ngspice ด้านล่างของ error นี้</li>
+          <li>ลองรัน DC ก่อน เพื่อยืนยันว่า operating point ทำงาน</li>
+        </ul>
+      </div>
+      {% endif %}
+
+      {% elif result %}
+      <div class="status-banner status-success">
+        <span class="status-dot"></span>
+        <strong>Simulation succeeded</strong>
+        <span>{{ result.analysis_label }}</span>
+        <span class="provenance-chip">ngspice</span>
+      </div>
+
+      <div class="provenance-grid">
+        <div><span>Engine</span><strong>{{ result.engine }}</strong></div>
+        <div><span>BJT model</span><strong>{{ result.model }}</strong></div>
+        <div><span>Run at</span><strong>{{ result.run_at }}</strong></div>
+        <div><span>เวลา</span><strong>{{ result.elapsed_ms }} ms</strong></div>
+      </div>
+
+      {% if result.warnings %}
+      <div class="alert alert-warning">
+        {% for message in result.warnings %}<p>{{ message }}</p>{% endfor %}
+      </div>
+      {% endif %}
+
+      <section class="result-section">
+        <div class="section-heading">
+          <h3>DC Operating Point</h3>
+          <span class="source-tag">ngspice .op</span>
+        </div>
+        <p class="region region-{{ result.dc.region }}">
+          Operating region (SPICE): <strong>{{ result.dc.region_label }}</strong>
+        </p>
+        {% if result.comparison %}
+        <div class="table-scroll">
+          <table class="results compare">
+            <thead>
+              <tr>
+                <th scope="col">ปริมาณ</th>
+                <th scope="col">SPICE (ngspice)</th>
+                <th scope="col">Analytical (Lab 03)</th>
+                <th scope="col">Δ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in result.comparison %}
+              <tr>
+                <th scope="row">{{ row.label }}</th>
+                <td>{{ row.spice }}</td>
+                <td>{{ row.analytical }}</td>
+                <td>{{ row.delta }} <span class="pct">{{ row.delta_pct }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+        <p class="note">{{ result.analytical_note }}</p>
+        <p class="raw-values">
+          <span class="raw-label">SPICE ดิบ:</span>
+          VB {{ result.dc.vb }} V · VE {{ result.dc.ve }} V · VC {{ result.dc.vc }} V ·
+          VCE {{ result.dc.vce }} V · IC {{ result.dc.ic_ma }} mA ·
+          IB {{ result.dc.ib_ua }} µA · IE {{ result.dc.ie_ma }} mA
+        </p>
+      </section>
+
+      {% if result.ac %}
+      <section class="result-section">
+        <div class="section-heading">
+          <h3>AC Frequency Response</h3>
+          <span class="source-tag">ngspice .ac</span>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-card">
+            <span>Midband gain</span>
+            <strong>{{ result.ac.midband_gain }} V/V</strong>
+            <small>{{ result.ac.midband_db }} dB @ {{ result.ac.midband_freq }}</small>
+          </div>
+          <div class="summary-card">
+            <span>Gain @ 1 kHz</span>
+            <strong>{{ result.ac.gain_1k }} V/V</strong>
+            <small>{{ result.ac.gain_1k_db }} dB · phase {{ result.ac.phase_1k }}</small>
+          </div>
+          <div class="summary-card">
+            <span>Low cutoff (−3 dB)</span>
+            <strong>{{ result.ac.low_cutoff }}</strong>
+            <small>วัดจาก magnitude ที่ลดลง 3 dB</small>
+          </div>
+          <div class="summary-card">
+            <span>High cutoff (−3 dB)</span>
+            <strong>{{ result.ac.high_cutoff }}</strong>
+            <small>ขึ้นกับ model และ parasitic capacitance</small>
+          </div>
+        </div>
+        <p class="note">
+          Sweep {{ result.ac.sweep }} · {{ result.ac.points }} จุด ·
+          AC source 1 V (small-signal) · {{ 'กลับเฟส' if result.ac.inverting else 'ไม่กลับเฟส' }}
+        </p>
+        <div class="chart-block">{{ result.ac.magnitude_chart|safe }}</div>
+        <div class="chart-block">{{ result.ac.phase_chart|safe }}</div>
+      </section>
+      {% endif %}
+
+      {% if result.tran %}
+      <section class="result-section">
+        <div class="section-heading">
+          <h3>Transient Response</h3>
+          <span class="source-tag">ngspice .tran</span>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-card">
+            <span>Vin amplitude</span>
+            <strong>{{ result.tran.vin_amp_mv }} mV peak</strong>
+            <small>วัดจาก waveform จริง</small>
+          </div>
+          <div class="summary-card">
+            <span>Vout amplitude</span>
+            <strong>{{ result.tran.vout_amp_mv }} mV peak</strong>
+            <small>วัดจาก waveform จริง</small>
+          </div>
+          <div class="summary-card">
+            <span>Gain</span>
+            <strong>{{ result.tran.gain }} V/V</strong>
+            <small>Vout amplitude ÷ Vin amplitude</small>
+          </div>
+          <div class="summary-card">
+            <span>Phase</span>
+            <strong>{{ result.tran.phase_text }}</strong>
+            <small>correlation {{ result.tran.correlation }}</small>
+          </div>
+        </div>
+        <p class="note">
+          หน้าต่าง {{ result.tran.window }} · {{ result.tran.points }} จุด ·
+          วัด 5 รอบสุดท้ายหลัง coupling capacitors เข้าสู่สภาวะคงตัว
+        </p>
+        <div class="chart-block">{{ result.tran.chart|safe }}</div>
+      </section>
+      {% endif %}
+
+      <details class="raw-details">
+        <summary>Netlist ที่ส่งให้ ngspice</summary>
+        <pre>{{ result.netlist }}</pre>
+      </details>
+      <details class="raw-details">
+        <summary>ngspice run log</summary>
+        <pre>{{ result.log }}</pre>
+      </details>
+      <p class="note provenance-note">
+        ตัวเลขและกราฟทั้งหมดในหน้านี้มาจากการรัน ngspice จริง ·
+        ผล Analytical ใช้เพื่อเปรียบเทียบเท่านั้น ไม่ได้ถูกนำมาใช้สร้างกราฟ
+      </p>
+
+      {% elif errors %}
+      <div class="status-banner status-error">
+        <span class="status-dot"></span>
+        <strong>Invalid input</strong>
+        <span>ยังไม่มีการเรียก ngspice</span>
+      </div>
+      <div class="empty-state">
+        <h2>แก้ค่าที่แจ้งเตือนก่อน</h2>
+        <p>ระบบตรวจค่าอินพุตก่อนสร้าง netlist จึงยังไม่มีผลหรือกราฟให้แสดง</p>
+      </div>
+
+      {% else %}
+      <div class="empty-state">
+        <h2>ผลการจำลองจะแสดงที่นี่</h2>
+        <p>เลือกโหมด DC / AC / Transient แล้วกด <strong>Run ngspice</strong> —
+          ตัวเลขและกราฟทั้งหมดจะมาจากการรันจริง</p>
+        <ul>
+          <li><strong>DC .op</strong> — VB, VE, VC, VCE, IC และเปรียบเทียบกับ Lab 03</li>
+          <li><strong>AC .ac</strong> — Bode magnitude (dB) และ phase (องศา) ตามความถี่</li>
+          <li><strong>Transient .tran</strong> — Vin/Vout ตามเวลา พร้อมตรวจการกลับเฟส</li>
+        </ul>
+      </div>
+      {% endif %}
+    </section>
+  </main>
+</body>
+</html>
